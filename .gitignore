@@ -1,0 +1,62 @@
+# Gradle and Kotlin build state
+.gradle/
+.gradle-local/
+.kotlin/
+build/
+app/build/
+**/build/
+
+# Android Studio / local machine configuration
+.idea/
+*.iml
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Generated packages and signing material
+*.apk
+*.aab
+*.jks
+*.keystore
+*.key
+*.p12
+*.pfx
+
+# Local archives, backups, and temporary files
+*.zip
+*.bak
+*.backup
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Emulator/device state and logs
+.android/
+*.avd/
+*.emu.cfg
+*.log
+
+# QA screenshots and recordings generated locally
+qa-*.png
+qa-*.jpg
+qa-*.jpeg
+screenshots/
+*.mp4
+
+# Secrets and local service configuration
+.env
+.env.*
+!.env.example
+secrets/
+secret/
+oauth*.json
+client_secret*.json
+service-account*.json
+service_account*.json
+google-services.json
+*.pem
+*.crt
+*.der

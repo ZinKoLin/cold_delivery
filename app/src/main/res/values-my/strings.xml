@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Cold Delivery</string>
+    <string name="home">ပင်မ</string>
+    <string name="customers">ဖောက်သည်များ</string>
+    <string name="stock">လက်ကျန်</string>
+    <string name="history">မှတ်တမ်း</string>
+    <string name="settings">ဆက်တင်</string>
+    <string name="offline_delivery_management">အင်တာနက်မလိုသော ပို့ဆောင်ရေးနှင့် လက်ကျန်စီမံခန့်ခွဲမှု</string>
+    <string name="login">ဝင်ရောက်ရန်</string>
+    <string name="delivery">ပို့ဆောင်မှု</string>
+    <string name="product_detail">ကုန်ပစ္စည်းအသေးစိတ်</string>
+    <string name="voucher">ဘောက်ချာ</string>
+    <string name="backup_restore">အရန်သိမ်း/ပြန်ယူ</string>
+    <string name="delivered">ပို့ပြီး</string><string name="pending">စောင့်ဆိုင်းနေသည်</string>
+    <string name="history_subtitle">ပို့ဆောင်မှုမှတ်တမ်း</string>
+    <string name="history_select_date">ရက်စွဲရွေးပါ</string><string name="history_date_epoch">ရက်စွဲ epoch day</string>
+    <string name="history_customer">ဖောက်သည်</string><string name="history_product">ကုန်ပစ္စည်း</string><string name="history_delivery_day">ပို့ရက်</string>
+    <string name="history_all_customers">ဖောက်သည်အားလုံး</string><string name="history_all_products">ကုန်ပစ္စည်းအားလုံး</string><string name="history_all_days">ရက်အားလုံး</string>
+    <string name="history_records">ပို့ဆောင်မှုမှတ်တမ်းများ</string><string name="history_empty">ပို့ဆောင်မှုမှတ်တမ်းမရှိပါ</string><string name="history_empty_hint">အခြား filter သို့မဟုတ် ရက်စွဲကို စမ်းကြည့်ပါ။</string><string name="history_items">ပစ္စည်း</string>
+    <string name="history_total_deliveries">ပို့ဆောင်မှုစုစုပေါင်း</string><string name="history_total_cartons">ကတ်တွန်စုစုပေါင်း</string><string name="history_total_amount">ငွေပမာဏစုစုပေါင်း</string>
+    <string name="todays_price">ယနေ့စျေးနှုန်း</string><string name="todays_price_subtitle">ဖောက်သည်အားလုံးအတွက် ယနေ့စျေးနှုန်း</string><string name="todays_price_info_title">ယနေ့စျေးနှုန်းသတ်မှတ်ခြင်း</string><string name="todays_price_info">ကုန်ပစ္စည်းတစ်မျိုးချင်းစီအတွက် စျေးနှုန်းတစ်ခု သတ်မှတ်ပါ။</string><string name="product_code">ကုဒ်</string><string name="product_name">ကုန်ပစ္စည်းအမည်</string><string name="price_mmk">စျေးနှုန်း (ကျပ်)</string><string name="carton">ကတ်တွန်</string><string name="save_todays_prices">ယနေ့စျေးနှုန်းများ သိမ်းရန်</string>
+    <string name="new_delivery">ပို့ဆောင်မှုအသစ်</string><string name="new_delivery_subtitle">ယနေ့ဖောက်သည်အော်ဒါ ပြင်ဆင်ရန်</string><string name="select_customer">ဖောက်သည်ရွေးပါ</string><string name="customer_details_hint">ဖောက်သည်အချက်အလက် ပေါ်လာပါမည်</string><string name="no_customers_scheduled_today">ယနေ့အတွက် ဖောက်သည်မရှိပါ</string><string name="closed_day">ဆိုင်ပိတ်ရက်</string><string name="customer">ဖောက်သည်</string><string name="delivery_date">ပို့ဆောင်မည့်ရက်</string><string name="delivery_items">ပို့ဆောင်မည့်ပစ္စည်းများ</string><string name="product">ကုန်ပစ္စည်း</string><string name="price_missing">စျေးနှုန်းမရှိပါ</string><string name="add_product">+ ကုန်ပစ္စည်းထည့်ရန်</string><string name="ctn">ကတ်တွန်</string><string name="qty">အရေအတွက်</string><string name="unit_price">တစ်ခုစျေး</string><string name="amount">ငွေပမာဏ</string><string name="total_qty">စုစုပေါင်းအရေအတွက်</string><string name="total_amount">စုစုပေါင်းငွေ</string><string name="save_delivery">ပို့ဆောင်မှုသိမ်းရန်</string>
+    <string name="delivery_voucher">ပို့ဆောင်မှုဘောက်ချာ</string><string name="item_details">ပစ္စည်းအသေးစိတ်</string><string name="total_price">စုစုပေါင်းစျေးနှုန်း</string><string name="note">မှတ်ချက်</string><string name="no_note">မှတ်ချက်မရှိပါ</string><string name="edit">ပြင်ရန်</string><string name="undo">ပြန်ဖျက်ရန်</string>
+    <string name="change_customer">ဖောက်သည်ပြောင်းရန်</string><string name="no_products_added">ကုန်ပစ္စည်း မထည့်ရသေးပါ</string><string name="add_products_hint">ပို့ဆောင်မှုအတွက် ကုန်ပစ္စည်းများ ထည့်ပါ။</string><string name="today_price">ယနေ့စျေးနှုန်း</string>
+</resources>

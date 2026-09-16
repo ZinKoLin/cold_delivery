@@ -49,11 +49,11 @@ import java.time.format.DateTimeFormatter
                     HomeSkyline(Modifier.align(Alignment.BottomEnd).size(148.dp, 61.dp))
                     Column(Modifier.align(Alignment.TopStart)) {
                         Text("${vm.today.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }} • ${vm.today.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))}", fontSize = 20.sp, lineHeight = 25.sp, fontWeight = FontWeight.Bold, color = ColdDeliveryColors.Charcoal, maxLines = 1)
-                        Text(if (vm.today.dayOfWeek.name == "SUNDAY") "Closed Day" else "Today Delivery", fontSize = 11.sp, lineHeight = 15.sp, color = ColdDeliveryColors.SecondaryText, modifier = Modifier.padding(top = 2.dp))
+                        Text(stringResource(if (vm.today.dayOfWeek.name == "SUNDAY") R.string.closed_day else R.string.today_delivery), fontSize = 11.sp, lineHeight = 15.sp, color = ColdDeliveryColors.SecondaryText, modifier = Modifier.padding(top = 2.dp))
                     }
                     if (vm.today.dayOfWeek.name != "SUNDAY") {
                         Surface(Modifier.align(Alignment.BottomStart), shape = CircleShape, color = Beige) {
-                            Text("${state.todayCustomers.size} ${if (state.todayCustomers.size == 1) "Customer" else "Customers"} Today", Modifier.padding(horizontal = 10.dp, vertical = 4.dp), color = DeepRed, fontSize = 10.sp, lineHeight = 14.sp, maxLines = 1)
+                            Text(stringResource(R.string.customers_today, state.todayCustomers.size), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), color = DeepRed, fontSize = 10.sp, lineHeight = 14.sp, maxLines = 1)
                         }
                     }
                 }
@@ -61,31 +61,31 @@ import java.time.format.DateTimeFormatter
             }
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HomeSummary("Customers", state.todayCustomers.size.toString(), ColdDeliveryColors.Charcoal, Icons.Default.People, Modifier.weight(1f))
-                    HomeSummary("Delivered", delivered.toString(), DeliveredGreen, Icons.Default.LocalShipping, Modifier.weight(1f))
-                    HomeSummary("Pending", pending.toString(), ColdDeliveryColors.Pending, Icons.Default.WarningAmber, Modifier.weight(1f))
+                    HomeSummary(stringResource(R.string.customers_label), state.todayCustomers.size.toString(), ColdDeliveryColors.Charcoal, Icons.Default.People, Modifier.weight(1f))
+                    HomeSummary(stringResource(R.string.delivered), delivered.toString(), DeliveredGreen, Icons.Default.LocalShipping, Modifier.weight(1f))
+                    HomeSummary(stringResource(R.string.pending), pending.toString(), ColdDeliveryColors.Pending, Icons.Default.WarningAmber, Modifier.weight(1f))
                 }
             }
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                     ColdDeliveryCard(Modifier.weight(1f).height(155.dp)) {
                         Column(Modifier.fillMaxSize().padding(horizontal = 11.dp, vertical = 10.dp)) {
-                            Text("Today's Price", color = ColdDeliveryColors.Charcoal, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                            Text(stringResource(R.string.todays_price), color = ColdDeliveryColors.Charcoal, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                             HorizontalDivider(Modifier.padding(top = 6.dp, bottom = 5.dp), color = Gold.copy(alpha = .5f))
-                            if (prices.isEmpty()) Text("Set today's prices", color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp)
+                            if (prices.isEmpty()) Text(stringResource(R.string.set_todays_prices), color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp)
                             prices.take(3).forEach { price ->
                                 val product = products.firstOrNull { it.id == price.productId }
                                 Row(Modifier.fillMaxWidth().height(25.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Text(product?.productName ?: "Product", Modifier.weight(1f), color = ColdDeliveryColors.Charcoal, fontSize = 10.sp, lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    Text(product?.productName ?: stringResource(R.string.product), Modifier.weight(1f), color = ColdDeliveryColors.Charcoal, fontSize = 10.sp, lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                     Spacer(Modifier.width(3.dp))
                                     Column(horizontalAlignment = Alignment.End) {
                                         Text("%,d".format(price.price), color = ColdDeliveryColors.Charcoal, fontSize = 10.sp, lineHeight = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                                        Text("MMK", color = ColdDeliveryColors.SecondaryText, fontSize = 8.sp, lineHeight = 9.sp)
+                                        Text(stringResource(R.string.mmk), color = ColdDeliveryColors.SecondaryText, fontSize = 8.sp, lineHeight = 9.sp)
                                     }
                                 }
                             }
                             Spacer(Modifier.weight(1f))
-                            TextButton(onClick = onPrice, contentPadding = PaddingValues(0.dp), modifier = Modifier.height(23.dp)) { Text("Open prices", color = DeepRed, fontSize = 10.sp) }
+                            TextButton(onClick = onPrice, contentPadding = PaddingValues(0.dp), modifier = Modifier.height(23.dp)) { Text(stringResource(R.string.open_prices), color = DeepRed, fontSize = 10.sp) }
                         }
                     }
                     ColdDeliveryCard(Modifier.weight(1f).height(155.dp)) {
@@ -93,21 +93,21 @@ import java.time.format.DateTimeFormatter
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.WarningAmber, null, tint = if (alerts.isEmpty()) DeliveredGreen else DeepRed, modifier = Modifier.size(15.dp))
                                 Spacer(Modifier.width(4.dp))
-                                Text("Stock Alert", color = if (alerts.isEmpty()) DeliveredGreen else DeepRed, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                                Text(stringResource(R.string.stock_alert), color = if (alerts.isEmpty()) DeliveredGreen else DeepRed, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                             }
                             HorizontalDivider(Modifier.padding(top = 6.dp, bottom = 5.dp), color = Gold.copy(alpha = .5f))
-                            if (alerts.isEmpty()) Text("Stock levels healthy", color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp)
+                            if (alerts.isEmpty()) Text(stringResource(R.string.stock_levels_healthy), color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp)
                             alerts.take(2).forEach { (product, remaining) ->
                                 Column(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
                                     Text(product.productName, color = ColdDeliveryColors.Charcoal, fontSize = 10.sp, lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                    Text(if (remaining == 0) "Zero Stock · 0 cartons" else "$remaining cartons · Low Stock", color = if (remaining == 0) DeepRed else ColdDeliveryColors.SecondaryText, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                                    Text(if (remaining == 0) stringResource(R.string.zero_stock_cartons) else stringResource(R.string.low_stock_cartons, remaining), color = if (remaining == 0) DeepRed else ColdDeliveryColors.SecondaryText, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
                                 }
                             }
                         }
                     }
                 }
             }
-            item { Text("Today's Customers", color = ColdDeliveryColors.Charcoal, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp)) }
+            item { Text(stringResource(R.string.todays_customers), color = ColdDeliveryColors.Charcoal, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp)) }
             items(state.todayCustomers, key = { it.id }) { customer ->
                 ColdDeliveryCard(Modifier.fillMaxWidth()) {
                     Row(Modifier.fillMaxWidth().padding(horizontal = 11.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -127,8 +127,8 @@ import java.time.format.DateTimeFormatter
                 }
             }
         }
-        Text("Myanmar’s refreshment reaches further together", color = Gold.copy(alpha = .78f), fontFamily = FontFamily.Serif, fontStyle = FontStyle.Italic, fontSize = 10.sp, lineHeight = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 49.dp).width(210.dp), maxLines = 2)
-        FloatingActionButton(onClick = onNewDelivery, containerColor = DeepRed, contentColor = Color.White, shape = CircleShape, elevation = FloatingActionButtonDefaults.elevation(6.dp), modifier = Modifier.align(Alignment.BottomEnd).padding(end = 14.dp, bottom = 15.dp).size(52.dp)) { Icon(Icons.Default.Add, "New delivery") }
+        Text(stringResource(R.string.footer_tagline), color = Gold.copy(alpha = .78f), fontFamily = FontFamily.Serif, fontStyle = FontStyle.Italic, fontSize = 10.sp, lineHeight = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 49.dp).width(210.dp), maxLines = 2)
+        FloatingActionButton(onClick = onNewDelivery, containerColor = DeepRed, contentColor = Color.White, shape = CircleShape, elevation = FloatingActionButtonDefaults.elevation(6.dp), modifier = Modifier.align(Alignment.BottomEnd).padding(end = 14.dp, bottom = 15.dp).size(52.dp)) { Icon(Icons.Default.Add, stringResource(R.string.new_delivery_cd)) }
     }
 }
 

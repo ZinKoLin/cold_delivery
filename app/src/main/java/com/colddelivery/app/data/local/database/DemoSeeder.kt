@@ -4,12 +4,18 @@ import androidx.room.withTransaction
 import com.colddelivery.app.data.local.entity.*
 import java.time.LocalDate
 import com.colddelivery.app.core.auth.PasswordHasher
+import android.util.Log
+import java.util.UUID
 
 object DemoSeeder {
     suspend fun seed(db: ColdDeliveryDatabase) = db.withTransaction {
         val existingUser = db.userDao().get()
         if (existingUser == null || existingUser.passwordIterations <= 0 || existingUser.passwordSalt.isBlank()) {
-            val stored = PasswordHasher.create("cold2026")
+            // Development/demo accounts must not embed a plaintext password in source control.
+            // A one-time password is generated at runtime and written to Logcat for local development.
+            val developmentPassword = UUID.randomUUID().toString().replace("-", "").take(12)
+            Log.i("ColdDeliveryDemo", "Generated local demo login: admin / $developmentPassword")
+            val stored = PasswordHasher.create(developmentPassword)
             db.userDao().upsert((existingUser ?: UserEntity(username = "admin", passwordHash = stored.hash)).copy(passwordHash = stored.hash, passwordSalt = stored.salt, passwordIterations = stored.iterations))
         }
         if (db.productDao().count() > 0) return@withTransaction

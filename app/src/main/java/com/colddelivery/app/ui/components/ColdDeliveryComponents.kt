@@ -99,7 +99,9 @@ val DeliveredGreen = ColdDeliveryColors.Delivered
     }
 }
 
-@Composable fun ColdDeliveryHeader(title: String = "Cold Delivery", subtitle: String = "Good Drinks · Brighter Tomorrows", language: String? = null, onLanguage: (String) -> Unit = {}, homeArtwork: Boolean = false) {
+@Composable fun ColdDeliveryHeader(title: String? = null, subtitle: String? = null, language: String? = null, onLanguage: (String) -> Unit = {}, homeArtwork: Boolean = false) {
+    val resolvedTitle = title ?: stringResource(R.string.app_name)
+    val resolvedSubtitle = subtitle ?: stringResource(R.string.app_tagline)
     Box(Modifier.fillMaxWidth().background(Brush.horizontalGradient(listOf(ColdDeliveryColors.DarkRed, DeepRed, ColdDeliveryColors.DarkRed))).statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(98.dp).padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(width = 48.dp, height = 70.dp)) {
@@ -111,9 +113,9 @@ val DeliveredGreen = ColdDeliveryColors.Delivered
             }
             Spacer(Modifier.width(8.dp))
             Column(Modifier.weight(1f)) {
-                Text(title, color = Color.White, fontSize = 22.sp, lineHeight = 28.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Serif, fontWeight = FontWeight.Bold, maxLines = 1)
+                Text(resolvedTitle, color = Color.White, fontSize = 22.sp, lineHeight = 28.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Serif, fontWeight = FontWeight.Bold, maxLines = 1)
                 Spacer(Modifier.height(5.dp))
-                Text(subtitle, color = Beige, fontSize = 10.sp, lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(resolvedSubtitle, color = Beige, fontSize = 10.sp, lineHeight = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             if (language != null) LanguageSegmentedControl(language, onLanguage)
         }

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,8 +48,8 @@ import kotlinx.coroutines.launch
             Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                 PagodaLineArt(Modifier.size(70.dp, 82.dp), opacity = .93f)
                 Spacer(Modifier.height(8.dp))
-                Text("Cold Delivery", color = Color.White, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp)
-                Text("Offline Delivery Management", color = Beige, fontFamily = FontFamily.Serif, fontSize = 13.sp, lineHeight = 20.sp)
+                Text(stringResource(com.colddelivery.app.R.string.app_name), color = Color.White, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp)
+                Text(stringResource(com.colddelivery.app.R.string.login_subtitle), color = Beige, fontFamily = FontFamily.Serif, fontSize = 13.sp, lineHeight = 20.sp)
                 Spacer(Modifier.height(7.dp))
                 Text("❈", color = Gold, fontSize = 18.sp)
             }
@@ -57,23 +58,23 @@ import kotlinx.coroutines.launch
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 22.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             LanguageSegmentedControl(language, { vm.saveLanguage(it); LanguageManager.apply(context, it) }, Modifier.padding(bottom = 25.dp))
-            Text(if (language == "my") "ကြိုဆိုပါတယ်" else "Welcome to Cold Delivery", color = ColdDeliveryColors.Charcoal, fontWeight = FontWeight.Bold, fontSize = 29.sp, lineHeight = 39.sp)
-            Text(if (language == "my") "Sign in to manage your deliveries" else "Sign in to manage your deliveries", color = ColdDeliveryColors.SecondaryText, fontSize = 14.sp, lineHeight = 21.sp)
+            Text(stringResource(com.colddelivery.app.R.string.welcome_to_cold_delivery), color = ColdDeliveryColors.Charcoal, fontWeight = FontWeight.Bold, fontSize = 29.sp, lineHeight = 39.sp)
+            Text(stringResource(com.colddelivery.app.R.string.sign_in_manage), color = ColdDeliveryColors.SecondaryText, fontSize = 14.sp, lineHeight = 21.sp)
             Spacer(Modifier.height(12.dp))
             MyanmarDecorativeDivider()
             Spacer(Modifier.height(20.dp))
 
-            OutlinedTextField(username, { username = it }, Modifier.fillMaxWidth().heightIn(min = 64.dp), label = { Text(if (language == "my") "အသုံးပြုသူအမည်" else "Username") }, leadingIcon = { Icon(Icons.Default.Person, null, tint = ColdDeliveryColors.SecondaryText) }, shape = ColdDeliveryShapes.Input, colors = fieldColors, singleLine = true)
+            OutlinedTextField(username, { username = it }, Modifier.fillMaxWidth().heightIn(min = 64.dp), label = { Text(stringResource(com.colddelivery.app.R.string.username)) }, leadingIcon = { Icon(Icons.Default.Person, null, tint = ColdDeliveryColors.SecondaryText) }, shape = ColdDeliveryShapes.Input, colors = fieldColors, singleLine = true)
             Spacer(Modifier.height(13.dp))
-            OutlinedTextField(password, { password = it }, Modifier.fillMaxWidth().heightIn(min = 64.dp), label = { Text(if (language == "my") "စကားဝှက်" else "Password") }, leadingIcon = { Icon(Icons.Default.Lock, null, tint = ColdDeliveryColors.SecondaryText) }, trailingIcon = { IconButton(onClick = { passwordVisible = !passwordVisible }) { Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordVisible) "Hide password" else "Show password", tint = ColdDeliveryColors.SecondaryText) } }, visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), shape = ColdDeliveryShapes.Input, colors = fieldColors, singleLine = true)
+            OutlinedTextField(password, { password = it }, Modifier.fillMaxWidth().heightIn(min = 64.dp), label = { Text(stringResource(com.colddelivery.app.R.string.password)) }, leadingIcon = { Icon(Icons.Default.Lock, null, tint = ColdDeliveryColors.SecondaryText) }, trailingIcon = { IconButton(onClick = { passwordVisible = !passwordVisible }) { Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, stringResource(if (passwordVisible) com.colddelivery.app.R.string.hide_password else com.colddelivery.app.R.string.show_password), tint = ColdDeliveryColors.SecondaryText) } }, visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), shape = ColdDeliveryShapes.Input, colors = fieldColors, singleLine = true)
             Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Checkbox(remember, { remember = it }, colors = CheckboxDefaults.colors(checkedColor = DeepRed)); Text(if (language == "my") "မှတ်ထားရန်" else "Remember me", color = ColdDeliveryColors.Charcoal, fontSize = 14.sp, lineHeight = 20.sp) }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Checkbox(remember, { remember = it }, colors = CheckboxDefaults.colors(checkedColor = DeepRed)); Text(stringResource(com.colddelivery.app.R.string.remember_me), color = ColdDeliveryColors.Charcoal, fontSize = 14.sp, lineHeight = 20.sp) }
             error?.let { Text(it, color = DeepRed, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) }
             Spacer(Modifier.height(22.dp))
-            PrimaryRedButton(if (language == "my") "ဝင်ရောက်ရန်" else "Login", { scope.launch { if (vm.login(username, password, remember)) onLoggedIn() else error = vm.message.value } }, Modifier.fillMaxWidth())
+            PrimaryRedButton(stringResource(com.colddelivery.app.R.string.login), { scope.launch { if (vm.login(username, password, remember)) onLoggedIn() else error = vm.message.value } }, Modifier.fillMaxWidth())
             Spacer(Modifier.height(30.dp))
             MyanmarDecorativeDivider()
-            Text("A Cooler Tomorrow for a Brighter Myanmar", color = ColdDeliveryColors.SecondaryText, fontFamily = FontFamily.Serif, fontSize = 13.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 6.dp))
+            Text(stringResource(com.colddelivery.app.R.string.footer_tagline), color = ColdDeliveryColors.SecondaryText, fontFamily = FontFamily.Serif, fontSize = 13.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 6.dp))
         }
     }
 }

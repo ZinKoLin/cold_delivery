@@ -124,4 +124,21 @@
     <string name="delivery_label">Delivery</string>
     <string name="english_language">English</string>
     <string name="myanmar_language">မြန်မာ</string>
+    <string name="history_delivery_history">Delivery History</string>
+    <string name="history_stock_balance">Stock Balance</string>
+    <string name="history_opening_stock">Opening Stock</string>
+    <string name="history_stock_in_movement">Stock In</string>
+    <string name="history_delivered_movement">Delivered</string>
+    <string name="history_closing_stock">Closing Stock</string>
+    <string name="history_total_stock">Total Stock</string>
+    <string name="history_total_products">Total Products</string>
+    <string name="history_select_date_short">Select Date</string>
+    <string name="history_previous_day">Previous Day</string>
+    <string name="history_next_day">Next Day</string>
+    <string name="history_no_stock_records">No stock records</string>
+    <string name="history_search_product">Search product</string>
+    <string name="history_stock_detail">Daily Stock Detail</string>
+    <string name="history_stock_in_detail">Stock In</string>
+    <string name="history_delivery_out">Delivery Out</string>
+    <string name="history_no_movement">No movement</string>
 </resources>

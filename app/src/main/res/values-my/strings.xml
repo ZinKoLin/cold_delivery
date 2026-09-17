@@ -132,4 +132,21 @@
     <string name="delivery_label">ပို့ဆောင်မှု</string>
     <string name="english_language">English</string>
     <string name="myanmar_language">မြန်မာ</string>
+    <string name="history_delivery_history">ပို့ဆောင်မှုမှတ်တမ်း</string>
+    <string name="history_stock_balance">လက်ကျန်စတော့မှတ်တမ်း</string>
+    <string name="history_opening_stock">အစလက်ကျန်</string>
+    <string name="history_stock_in_movement">လက်ကျန်ဝင်</string>
+    <string name="history_delivered_movement">ပို့ပြီး</string>
+    <string name="history_closing_stock">ပိတ်ချိန်လက်ကျန်</string>
+    <string name="history_total_stock">လက်ကျန်စုစုပေါင်း</string>
+    <string name="history_total_products">ကုန်ပစ္စည်းစုစုပေါင်း</string>
+    <string name="history_select_date_short">ရက်စွဲရွေးပါ</string>
+    <string name="history_previous_day">ယခင်ရက်</string>
+    <string name="history_next_day">နောက်ရက်</string>
+    <string name="history_no_stock_records">လက်ကျန်မှတ်တမ်းမရှိပါ</string>
+    <string name="history_search_product">ကုန်ပစ္စည်းရှာရန်</string>
+    <string name="history_stock_detail">နေ့စဉ်လက်ကျန်အသေးစိတ်</string>
+    <string name="history_stock_in_detail">လက်ကျန်ဝင်</string>
+    <string name="history_delivery_out">ပို့ထုတ်မှု</string>
+    <string name="history_no_movement">လှုပ်ရှားမှုမရှိပါ</string>
 </resources>

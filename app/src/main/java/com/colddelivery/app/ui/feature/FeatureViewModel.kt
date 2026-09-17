@@ -6,6 +6,8 @@ import com.colddelivery.app.data.local.database.ColdDeliveryDatabase
 import com.colddelivery.app.data.local.entity.*
 import com.colddelivery.app.data.preferences.PreferencesStore
 import com.colddelivery.app.data.repository.DeliveryRepository
+import com.colddelivery.app.core.history.HistoricalStockBalance
+import com.colddelivery.app.core.history.requireHistoricalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import kotlinx.coroutines.flow.*
@@ -50,4 +52,10 @@ class FeatureViewModel @Inject constructor(private val db: ColdDeliveryDatabase,
     suspend fun saveDelivery(customerId: Long, date: Long, items: List<Pair<Long, Int>>): Long = repository.saveDelivered(customerId, date, items, System.currentTimeMillis())
     suspend fun undo(deliveryId: Long) = repository.undo(deliveryId)
     suspend fun edit(deliveryId: Long, items: List<Pair<Long, Int>>) = repository.editDelivered(deliveryId, items, System.currentTimeMillis())
+    suspend fun historicalStock(productId: Long, date: Long): HistoricalStockBalance {
+        requireHistoricalDate(date, today)
+        val opening = db.stockBatchDao().initialStockBefore(productId, date) - db.deliveryItemDao().deliveredBefore(productId, date)
+        return HistoricalStockBalance(productId, opening, db.stockBatchDao().stockInOn(productId, date), db.deliveryItemDao().deliveredOn(productId, date))
+    }
+    suspend fun historicalMovements(productId: Long, date: Long) = Pair(db.stockBatchDao().allForProduct(productId).filter { it.stockInDate == date }, db.deliveryItemDao().movementsOn(productId, date))
 }

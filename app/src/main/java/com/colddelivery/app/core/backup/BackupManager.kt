@@ -10,9 +10,9 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-class BackupManager(private val context: Context, private val database: RoomDatabase, private val preferences: PreferencesStore = PreferencesStore(context)) {
+class BackupManager(private val context: Context, private val database: RoomDatabase, private val preferences: PreferencesStore = PreferencesStore(context), private val exitProcess: () -> Unit = { android.os.Process.killProcess(android.os.Process.myPid()) }) {
     fun create(uri: Uri): Result<Unit> = runCatching {
-        database.openHelper.writableDatabase.query("PRAGMA wal_checkpoint(FULL)").close()
+        database.openHelper.writableDatabase.query("PRAGMA wal_checkpoint(FULL)").use { it.moveToFirst() }
         val dbFile = context.getDatabasePath("cold_delivery.db")
         context.contentResolver.openOutputStream(uri)?.use { output -> ZipOutputStream(output).use { zip ->
             zip.putNextEntry(ZipEntry("cold_delivery.db")); dbFile.inputStream().use { it.copyTo(zip) }; zip.closeEntry()
@@ -28,12 +28,12 @@ class BackupManager(private val context: Context, private val database: RoomData
         require(entries["metadata.txt"]?.decodeToString()?.contains("databaseVersion=2") == true) { "Unsupported backup version" }
         require(entries.containsKey("cold_delivery.db")) { "Backup database is missing" }
         val dbFile = context.getDatabasePath("cold_delivery.db"); File(dbFile.parentFile, "cold_delivery_safety_${System.currentTimeMillis()}.db").let { dbFile.copyTo(it, overwrite = true) }
-        database.close(); dbFile.writeBytes(entries.getValue("cold_delivery.db"))
+        database.close(); File("${dbFile.path}-wal").delete(); File("${dbFile.path}-shm").delete(); File("${dbFile.path}-journal").delete(); dbFile.writeBytes(entries.getValue("cold_delivery.db"))
         entries["preferences.txt"]?.decodeToString()?.lineSequence()?.filter { it.contains('=') }?.associate { it.substringBefore('=') to it.substringAfter('=') }?.let { values ->
             val snapshot = PreferencesStore.Snapshot(values["language"] ?: "en", values["rememberMe"]?.toBoolean() ?: false, values["lowStockThreshold"]?.toIntOrNull() ?: 10)
             runBlocking { preferences.importSnapshot(snapshot) }
         }
         temp.delete()
-        android.os.Process.killProcess(android.os.Process.myPid())
+        exitProcess()
     }
 }

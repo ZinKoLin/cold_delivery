@@ -14,6 +14,15 @@ class HistoricalStockBalanceTest {
         assertEquals(42, historicalBalance(30, 20 + 5, 10 + 3).closingStock)
     }
 
+    @Test fun `card and detail use identical balance values for the same product and date`() {
+        val balance = historicalBalance(150, 0, 10)
+
+        assertEquals(150, balance.openingStock)
+        assertEquals(0, balance.stockIn)
+        assertEquals(10, balance.delivered)
+        assertEquals(140, balance.closingStock)
+    }
+
     @Test fun `zero stock and zero movement remain visible as zero`() {
         assertEquals(0, historicalBalance(0, 0, 0).closingStock)
     }

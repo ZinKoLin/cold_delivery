@@ -7,7 +7,7 @@ plugins {
 }
 
 android { namespace = "com.colddelivery.app"; compileSdk = 35
-    defaultConfig { applicationId = "com.colddelivery.app"; minSdk = 26; targetSdk = 35; versionCode = 1; versionName = "1.0"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
+    defaultConfig { applicationId = "com.colddelivery.app"; minSdk = 26; targetSdk = 35; versionCode = 1; versionName = "1.0.0"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     buildFeatures { compose = true }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21 }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }

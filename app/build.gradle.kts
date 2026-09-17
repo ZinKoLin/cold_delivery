@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -6,11 +8,45 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.isFile) localPropertiesFile.inputStream().use(localProperties::load)
+fun signingValue(name: String): String? = System.getenv(name) ?: localProperties.getProperty(name)
+val releaseStoreFilePath = signingValue("RELEASE_STORE_FILE")
+val releaseStorePassword = signingValue("RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = signingValue("RELEASE_KEY_ALIAS")
+val releaseKeyPassword = signingValue("RELEASE_KEY_PASSWORD")
+val releaseSigningConfigured = listOf(releaseStoreFilePath, releaseStorePassword, releaseKeyAlias, releaseKeyPassword).all { !it.isNullOrBlank() }
+
 android { namespace = "com.colddelivery.app"; compileSdk = 35
     defaultConfig { applicationId = "com.colddelivery.app"; minSdk = 26; targetSdk = 35; versionCode = 1; versionName = "1.0.0"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
-    buildFeatures { compose = true }
+    signingConfigs {
+        create("release") {
+            if (releaseSigningConfigured) {
+                storeFile = file(requireNotNull(releaseStoreFilePath))
+                storePassword = requireNotNull(releaseStorePassword)
+                keyAlias = requireNotNull(releaseKeyAlias)
+                keyPassword = requireNotNull(releaseKeyPassword)
+            }
+        }
+    }
+    buildTypes {
+        release {
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+    buildFeatures { compose = true; buildConfig = true }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21 }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+}
+
+tasks.configureEach {
+    if (name == "assembleRelease" || name == "bundleRelease") {
+        doFirst {
+            check(releaseSigningConfigured) { "Release signing is not configured. Set RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS, and RELEASE_KEY_PASSWORD in local.properties or the environment." }
+        }
+    }
 }
 
 kotlin { jvmToolchain(21) }

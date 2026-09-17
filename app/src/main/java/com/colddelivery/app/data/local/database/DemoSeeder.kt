@@ -1,5 +1,7 @@
 package com.colddelivery.app.data.local.database
 
+import com.colddelivery.app.BuildConfig
+
 import androidx.room.withTransaction
 import com.colddelivery.app.data.local.entity.*
 import java.time.LocalDate
@@ -14,7 +16,9 @@ object DemoSeeder {
             // Development/demo accounts must not embed a plaintext password in source control.
             // A one-time password is generated at runtime and written to Logcat for local development.
             val developmentPassword = UUID.randomUUID().toString().replace("-", "").take(12)
-            Log.i("ColdDeliveryDemo", "Generated local demo login: admin / $developmentPassword")
+            if (BuildConfig.DEBUG) {
+                Log.i("ColdDeliveryDemo", "Generated local demo login: admin / $developmentPassword")
+            }
             val stored = PasswordHasher.create(developmentPassword)
             db.userDao().upsert((existingUser ?: UserEntity(username = "admin", passwordHash = stored.hash)).copy(passwordHash = stored.hash, passwordSalt = stored.salt, passwordIterations = stored.iterations))
         }

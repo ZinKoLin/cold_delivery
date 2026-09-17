@@ -141,4 +141,12 @@
     <string name="history_stock_in_detail">Stock In</string>
     <string name="history_delivery_out">Delivery Out</string>
     <string name="history_no_movement">No movement</string>
+    <string name="first_time_setup">First-Time Setup</string>
+    <string name="create_login_password">Create your login password</string>
+    <string name="create_password">Create Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="create_account">Create Account</string>
+    <string name="password_required">Password is required</string>
+    <string name="password_min_length">Password must be at least 8 characters</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
 </resources>

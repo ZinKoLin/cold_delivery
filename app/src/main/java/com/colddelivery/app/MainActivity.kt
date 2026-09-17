@@ -16,11 +16,13 @@ import com.colddelivery.app.ui.screens.*
 import com.colddelivery.app.ui.feature.*
 import com.colddelivery.app.ui.auth.AuthViewModel
 import com.colddelivery.app.ui.auth.PremiumLoginScreen
+import com.colddelivery.app.ui.auth.PremiumAccountSetupScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.colddelivery.app.data.preferences.readSavedLanguage
 import com.colddelivery.app.ui.feature.LanguageManager
 import dagger.hilt.android.AndroidEntryPoint
 import com.colddelivery.app.ui.theme.ColdDeliveryColors
+import com.colddelivery.app.core.auth.shouldShowFirstRunSetup
 import androidx.compose.ui.graphics.toArgb
 
 @AndroidEntryPoint
@@ -29,7 +31,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); window.statusBarColor = ColdDeliveryColors.DeepRed.toArgb(); window.decorView.systemUiVisibility = 0; setContent { ColdDeliveryTheme { Surface { AuthGate() } } } }
 }
 
-@Composable private fun AuthGate(vm: AuthViewModel = hiltViewModel()) { val remembered by vm.rememberMe.collectAsState(); var loggedIn by rememberSaveable { mutableStateOf(false) }; if (remembered || loggedIn) AppNavigation(onLogout = { vm.logout(); loggedIn = false }) else PremiumLoginScreen(onLoggedIn = { loggedIn = true }, vm = vm) }
+@Composable private fun AuthGate(vm: AuthViewModel = hiltViewModel()) { val remembered by vm.rememberMe.collectAsState(); val user by vm.user.collectAsState(); var loggedIn by rememberSaveable { mutableStateOf(false) }; var setupComplete by rememberSaveable { mutableStateOf(false) }; val setupRequired = shouldShowFirstRunSetup(BuildConfig.DEBUG, user != null) && !setupComplete; when { remembered || loggedIn -> AppNavigation(onLogout = { vm.logout(); loggedIn = false }); setupRequired -> PremiumAccountSetupScreen(onCreated = { setupComplete = true }, vm = vm); else -> PremiumLoginScreen(onLoggedIn = { loggedIn = true }, vm = vm) } }
 
 @Composable private fun AppNavigation(onLogout: () -> Unit = {}) {
     val nav = rememberNavController()

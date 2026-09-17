@@ -13,14 +13,14 @@ object DemoSeeder {
     suspend fun seed(db: ColdDeliveryDatabase) = db.withTransaction {
         val existingUser = db.userDao().get()
         if (existingUser == null || existingUser.passwordIterations <= 0 || existingUser.passwordSalt.isBlank()) {
-            // Development/demo accounts must not embed a plaintext password in source control.
-            // A one-time password is generated at runtime and written to Logcat for local development.
-            val developmentPassword = UUID.randomUUID().toString().replace("-", "").take(12)
             if (BuildConfig.DEBUG) {
+                // Development/demo accounts must not embed a plaintext password in source control.
+                // A one-time password is generated at runtime and written to Logcat for local development.
+                val developmentPassword = UUID.randomUUID().toString().replace("-", "").take(12)
                 Log.i("ColdDeliveryDemo", "Generated local demo login: admin / $developmentPassword")
+                val stored = PasswordHasher.create(developmentPassword)
+                db.userDao().upsert((existingUser ?: UserEntity(username = "admin", passwordHash = stored.hash)).copy(passwordHash = stored.hash, passwordSalt = stored.salt, passwordIterations = stored.iterations))
             }
-            val stored = PasswordHasher.create(developmentPassword)
-            db.userDao().upsert((existingUser ?: UserEntity(username = "admin", passwordHash = stored.hash)).copy(passwordHash = stored.hash, passwordSalt = stored.salt, passwordIterations = stored.iterations))
         }
         if (db.productDao().count() > 0) return@withTransaction
         val now = System.currentTimeMillis(); val today = LocalDate.now().toEpochDay()

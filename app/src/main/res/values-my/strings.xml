@@ -149,4 +149,12 @@
     <string name="history_stock_in_detail">လက်ကျန်ဝင်</string>
     <string name="history_delivery_out">ပို့ထုတ်မှု</string>
     <string name="history_no_movement">လှုပ်ရှားမှုမရှိပါ</string>
+    <string name="first_time_setup">ပထမဆုံး စတင်သတ်မှတ်ခြင်း</string>
+    <string name="create_login_password">ဝင်ရောက်ရန် စကားဝှက်ဖန်တီးပါ</string>
+    <string name="create_password">စကားဝှက်ဖန်တီးရန်</string>
+    <string name="confirm_password">စကားဝှက်အတည်ပြုရန်</string>
+    <string name="create_account">အကောင့်ဖန်တီးရန်</string>
+    <string name="password_required">စကားဝှက်ထည့်ရန်လိုသည်</string>
+    <string name="password_min_length">စကားဝှက်သည် အနည်းဆုံး စာလုံး ၈ လုံးရှိရမည်</string>
+    <string name="passwords_do_not_match">စကားဝှက်များ မကိုက်ညီပါ</string>
 </resources>

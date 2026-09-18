@@ -100,6 +100,11 @@
     <string name="open_backup_restore">Open Backup &amp; Restore</string>
     <string name="app_version">App version</string>
     <string name="logout">Logout</string>
+    <string name="developer">Developer</string>
+    <string name="developer_profile">Developer Profile</string>
+    <string name="app_developer">App Developer</string>
+    <string name="close">Close</string>
+    <string name="developer_profile_image">Developer profile photo</string>
     <string name="backup_subtitle">Protect your local delivery records</string>
     <string name="backup_status">Backup status</string>
     <string name="backup_none">No backup action in this session</string>

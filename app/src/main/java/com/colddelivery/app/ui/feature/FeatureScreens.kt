@@ -8,6 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,6 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.colddelivery.app.core.backup.BackupManager
@@ -35,6 +41,8 @@ import com.colddelivery.app.ui.theme.ColdDeliveryColors
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import android.content.Intent
+import android.net.Uri
 
 private fun money(v: Long) = "%,d MMK".format(v)
 private fun day(v: Long) = LocalDate.ofEpochDay(v).format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
@@ -148,8 +156,45 @@ private fun day(v: Long) = LocalDate.ofEpochDay(v).format(DateTimeFormatter.ofPa
 @Composable private fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) { ColdDeliveryCard(modifier.heightIn(min = 78.dp)) { Column(Modifier.fillMaxWidth().padding(11.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) { Text(label, color = ColdDeliveryColors.SecondaryText, fontSize = 10.sp); Text(value, color = DeepRed, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1) } } }
 
 @Composable fun SettingsScreen(onLogin: () -> Unit, onBackup: () -> Unit = {}, vm: FeatureViewModel = hiltViewModel()) {
-    val language by vm.language.collectAsState(); val threshold by vm.lowStockThreshold.collectAsState(); val context = LocalContext.current; var input by remember(threshold) { mutableStateOf(threshold.toString()) }
-    PremiumPage { PremiumPageTitle(stringResource(com.colddelivery.app.R.string.settings), stringResource(com.colddelivery.app.R.string.settings_subtitle)); ColdDeliveryCard { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(stringResource(com.colddelivery.app.R.string.language), color = DeepRed, fontWeight = FontWeight.Bold); LanguageSegmentedControl(language, { vm.saveLanguage(it); LanguageManager.apply(context, it) }, Modifier.fillMaxWidth()); Text(stringResource(com.colddelivery.app.R.string.language_hint), color = ColdDeliveryColors.SecondaryText, fontSize = 10.sp) } }; ColdDeliveryCard { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(stringResource(com.colddelivery.app.R.string.stock_alerts), color = DeepRed, fontWeight = FontWeight.Bold); Field(input, { input = it.filter(Char::isDigit) }, stringResource(com.colddelivery.app.R.string.low_stock_threshold), KeyboardType.Number); TextButton({ input.toIntOrNull()?.let(vm::saveThreshold) }) { Text(stringResource(com.colddelivery.app.R.string.save_threshold), color = DeepRed, fontSize = 11.sp) } } }; ColdDeliveryCard { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(stringResource(com.colddelivery.app.R.string.backup_restore_section), color = DeepRed, fontWeight = FontWeight.Bold); Text(stringResource(com.colddelivery.app.R.string.backup_hint), color = ColdDeliveryColors.SecondaryText, fontSize = 10.sp); PrimaryRedButton(stringResource(com.colddelivery.app.R.string.open_backup_restore), onBackup, Modifier.fillMaxWidth()) } }; ColdDeliveryCard { Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(stringResource(com.colddelivery.app.R.string.app_version), color = ColdDeliveryColors.SecondaryText); Text("1.0", fontWeight = FontWeight.Bold) } }; Spacer(Modifier.weight(1f)); PremiumOutlinedButton(stringResource(com.colddelivery.app.R.string.logout), onLogin, Modifier.fillMaxWidth()) }
+    val language by vm.language.collectAsState()
+    val threshold by vm.lowStockThreshold.collectAsState()
+    var input by remember(threshold) { mutableStateOf(threshold.toString()) }
+    var developerOpen by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    PremiumPage {
+        PremiumPageTitle(stringResource(com.colddelivery.app.R.string.settings), stringResource(com.colddelivery.app.R.string.settings_subtitle))
+        ColdDeliveryCard { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(stringResource(com.colddelivery.app.R.string.language), color = DeepRed, fontWeight = FontWeight.Bold); LanguageSegmentedControl(language, { vm.saveLanguage(it); LanguageManager.apply(context, it) }, Modifier.fillMaxWidth()); Text(stringResource(com.colddelivery.app.R.string.language_hint), color = ColdDeliveryColors.SecondaryText, fontSize = 10.sp) } }
+        ColdDeliveryCard { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(stringResource(com.colddelivery.app.R.string.stock_alerts), color = DeepRed, fontWeight = FontWeight.Bold); Field(input, { input = it.filter(Char::isDigit) }, stringResource(com.colddelivery.app.R.string.low_stock_threshold), KeyboardType.Number); TextButton({ input.toIntOrNull()?.let(vm::saveThreshold) }) { Text(stringResource(com.colddelivery.app.R.string.save_threshold), color = DeepRed, fontSize = 11.sp) } } }
+        ColdDeliveryCard { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(stringResource(com.colddelivery.app.R.string.backup_restore_section), color = DeepRed, fontWeight = FontWeight.Bold); Text(stringResource(com.colddelivery.app.R.string.backup_hint), color = ColdDeliveryColors.SecondaryText, fontSize = 10.sp); PrimaryRedButton(stringResource(com.colddelivery.app.R.string.open_backup_restore), onBackup, Modifier.fillMaxWidth()) } }
+        ColdDeliveryCard(Modifier.fillMaxWidth().clickable { developerOpen = true }) {
+            Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Surface(Modifier.size(38.dp), shape = CircleShape, color = DeepRed.copy(alpha = .10f)) { Box(contentAlignment = Alignment.Center) { Text("♙", color = DeepRed, fontSize = 20.sp) } }
+                Spacer(Modifier.width(10.dp))
+                Column { Text(stringResource(com.colddelivery.app.R.string.developer), color = DeepRed, fontWeight = FontWeight.Bold); Text(stringResource(com.colddelivery.app.R.string.developer_profile), color = ColdDeliveryColors.SecondaryText, fontSize = 10.sp) }
+            }
+        }
+        ColdDeliveryCard { Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(stringResource(com.colddelivery.app.R.string.app_version), color = ColdDeliveryColors.SecondaryText); Text("1.0", fontWeight = FontWeight.Bold) } }
+        Spacer(Modifier.weight(1f))
+        PremiumOutlinedButton(stringResource(com.colddelivery.app.R.string.logout), onLogin, Modifier.fillMaxWidth())
+    }
+    if (developerOpen) {
+        Dialog(onDismissRequest = { developerOpen = false }) {
+            Surface(shape = RoundedCornerShape(28.dp), color = ColdDeliveryColors.Ivory, tonalElevation = 8.dp, modifier = Modifier.fillMaxWidth(.88f)) {
+                Column(Modifier.padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(com.colddelivery.app.R.string.developer_profile), color = DeepRed, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.fillMaxWidth())
+                    PrimaryRedButton(stringResource(com.colddelivery.app.R.string.close), { developerOpen = false }, Modifier.fillMaxWidth())
+                    Image(painterResource(com.colddelivery.app.R.drawable.developer_profile), stringResource(com.colddelivery.app.R.string.developer_profile_image), Modifier.size(118.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+                    Text("Zin Ko Lyn", color = ColdDeliveryColors.Charcoal, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    Text(stringResource(com.colddelivery.app.R.string.app_developer), color = Gold, fontSize = 12.sp)
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable { context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:09699666060"))) }.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(com.colddelivery.app.R.string.phone), color = ColdDeliveryColors.SecondaryText, fontSize = 12.sp)
+                        Spacer(Modifier.width(8.dp))
+                        Text("09699666060", color = ColdDeliveryColors.Charcoal, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable fun BackupScreen(onBack: () -> Unit, vm: FeatureViewModel = hiltViewModel()) {

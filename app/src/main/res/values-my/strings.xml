@@ -108,6 +108,11 @@
     <string name="open_backup_restore">အရန်သိမ်း/ပြန်ယူ ဖွင့်ရန်</string>
     <string name="app_version">App ဗားရှင်း</string>
     <string name="logout">ထွက်ရန်</string>
+    <string name="developer">Developer / ဖန်တီးသူ</string>
+    <string name="developer_profile">Developer Profile / ဖန်တီးသူအချက်အလက်</string>
+    <string name="app_developer">App Developer / App ဖန်တီးသူ</string>
+    <string name="close">ပိတ်မည်</string>
+    <string name="developer_profile_image">ဖန်တီးသူ၏ ပရိုဖိုင်ဓာတ်ပုံ</string>
     <string name="backup_subtitle">Local ပို့ဆောင်မှုမှတ်တမ်းများကို ကာကွယ်ရန်</string>
     <string name="backup_status">အရန်သိမ်းအခြေအနေ</string>
     <string name="backup_none">ဒီ session တွင် အရန်လုပ်ဆောင်မှု မရှိသေးပါ</string>

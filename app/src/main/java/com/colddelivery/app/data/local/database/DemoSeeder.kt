@@ -10,6 +10,7 @@ import android.util.Log
 import java.util.UUID
 
 object DemoSeeder {
+    internal fun shouldSeedDemoBusinessData(isDebug: Boolean): Boolean = isDebug
     suspend fun seed(db: ColdDeliveryDatabase) = db.withTransaction {
         val existingUser = db.userDao().get()
         if (existingUser == null || existingUser.passwordIterations <= 0 || existingUser.passwordSalt.isBlank()) {
@@ -22,6 +23,7 @@ object DemoSeeder {
                 db.userDao().upsert((existingUser ?: UserEntity(username = "admin", passwordHash = stored.hash)).copy(passwordHash = stored.hash, passwordSalt = stored.salt, passwordIterations = stored.iterations))
             }
         }
+        if (!shouldSeedDemoBusinessData(BuildConfig.DEBUG)) return@withTransaction
         if (db.productDao().count() > 0) return@withTransaction
         val now = System.currentTimeMillis(); val today = LocalDate.now().toEpochDay()
         val products = listOf(

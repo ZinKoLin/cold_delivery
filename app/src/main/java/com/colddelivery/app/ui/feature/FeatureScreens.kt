@@ -183,8 +183,10 @@ private fun day(v: Long) = LocalDate.ofEpochDay(v).format(DateTimeFormatter.ofPa
         Dialog(onDismissRequest = { developerOpen = false }) {
             Surface(shape = RoundedCornerShape(28.dp), color = ColdDeliveryColors.Ivory, tonalElevation = 8.dp, modifier = Modifier.fillMaxWidth(.88f)) {
                 Column(Modifier.padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(stringResource(com.colddelivery.app.R.string.developer_profile), color = DeepRed, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.fillMaxWidth())
-                    IconButton(onClick = { developerOpen = false }, modifier = Modifier.align(Alignment.End)) { Icon(Icons.Default.Close, contentDescription = stringResource(com.colddelivery.app.R.string.close), tint = DeepRed) }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(com.colddelivery.app.R.string.developer_profile), color = DeepRed, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
+                        IconButton(onClick = { developerOpen = false }) { Icon(Icons.Default.Close, contentDescription = stringResource(com.colddelivery.app.R.string.close), tint = DeepRed) }
+                    }
                     Image(painterResource(com.colddelivery.app.R.drawable.developer_profile), stringResource(com.colddelivery.app.R.string.developer_profile_image), Modifier.size(118.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                     Text("Zin Ko Lyn", color = ColdDeliveryColors.Charcoal, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                     Text(stringResource(com.colddelivery.app.R.string.app_developer), color = Gold, fontSize = 12.sp)

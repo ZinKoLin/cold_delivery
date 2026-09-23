@@ -151,7 +151,7 @@ private data class StockInLine(val product: ProductEntity, val quantity: Int)
                     Text(stringResource(com.colddelivery.app.R.string.stock_in_date, day(ticketDate)), color = ColdDeliveryColors.Charcoal)
                 }
                 Select(stringResource(com.colddelivery.app.R.string.select_product_label), selected?.productName ?: stringResource(com.colddelivery.app.R.string.select_product)) {
-                    products.forEach { product -> DropdownMenuItem(text = { Text("\${product.productName} (\${product.productCode})") }, onClick = { selected = product }) }
+                    products.forEach { product -> DropdownMenuItem(text = { Text("${product.productName} (${product.productCode})") }, onClick = { selected = product }) }
                 }
                 Field(qty, { qty = it }, stringResource(com.colddelivery.app.R.string.quantity_ctn), KeyboardType.Number)
                 TextButton(onClick = {
@@ -174,7 +174,7 @@ private data class StockInLine(val product: ProductEntity, val quantity: Int)
                             Text(line.product.productName, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             Text(line.product.productCode, color = Gold, fontSize = 10.sp)
                         }
-                        Text("\${line.quantity} CTN", fontWeight = FontWeight.Bold)
+                        Text("${line.quantity} CTN", fontWeight = FontWeight.Bold)
                         IconButton(onClick = { lines = lines.filterNot { it.product.id == line.product.id } }) {
                             Icon(Icons.Default.Close, contentDescription = stringResource(com.colddelivery.app.R.string.remove))
                         }
@@ -202,7 +202,7 @@ private data class StockInLine(val product: ProductEntity, val quantity: Int)
         AlertDialog(onDismissRequest = { confirmOpen = false }, title = { Text(stringResource(com.colddelivery.app.R.string.confirm_stock_in_ticket)) }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(com.colddelivery.app.R.string.stock_in_date, day(ticketDate)))
-                lines.forEach { Text("\${it.product.productName}: \${it.quantity} CTN") }
+                lines.forEach { Text("${it.product.productName}: ${it.quantity} CTN") }
             }
         }, confirmButton = {
             TextButton(onClick = {

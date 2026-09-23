@@ -118,18 +118,54 @@ private fun day(v: Long) = LocalDate.ofEpochDay(v).format(DateTimeFormatter.ofPa
 }
 
 @Composable fun CustomerDetailScreen(customerId: Long, onSaved: () -> Unit, vm: FeatureViewModel = hiltViewModel()) {
-    val customers by vm.customers.collectAsState(); val current = customers.firstOrNull { it.id == customerId } ?: return; var name by remember(current) { mutableStateOf(current.name) }; var phone by remember(current) { mutableStateOf(current.phone) }; var address by remember(current) { mutableStateOf(current.address) }; var note by remember(current) { mutableStateOf(current.note) }; var selected by remember(current) { mutableStateOf(current.deliveryDay) }; val scope = rememberCoroutineScope()
-    PremiumPage { PremiumPageTitle(stringResource(com.colddelivery.app.R.string.customer_detail), stringResource(com.colddelivery.app.R.string.customer_detail_subtitle)); ColdDeliveryCard { Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Field(name, { name = it }, stringResource(com.colddelivery.app.R.string.name)); Field(phone, { phone = it }, stringResource(com.colddelivery.app.R.string.phone), KeyboardType.Phone); Field(address, { address = it }, stringResource(com.colddelivery.app.R.string.address)); Select(stringResource(com.colddelivery.app.R.string.delivery_day), selected.name) { DeliveryDay.values().forEach { d -> DropdownMenuItem(text = { Text(d.name) }, onClick = { selected = d }) } }; Field(note, { note = it }, stringResource(com.colddelivery.app.R.string.note)) } }; Text(stringResource(com.colddelivery.app.R.string.sort_order, current.sortOrder), color = Gold, fontSize = 11.sp); Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { PremiumOutlinedButton(stringResource(com.colddelivery.app.R.string.move_up), { scope.launch { vm.moveCustomer(customerId, -1) } }, Modifier.weight(1f)); PremiumOutlinedButton(stringResource(com.colddelivery.app.R.string.move_down), { scope.launch { vm.moveCustomer(customerId, 1) } }, Modifier.weight(1f)) }; Spacer(Modifier.weight(1f)); TextButton({ scope.launch { vm.updateCustomer(current.copy(isActive = false)); onSaved() } }) { Text(stringResource(com.colddelivery.app.R.string.archive_customer), color = DeepRed, fontSize = 11.sp) }; PrimaryRedButton(stringResource(com.colddelivery.app.R.string.save_changes), { scope.launch { vm.updateCustomer(current.copy(name = name, phone = phone, address = address, note = note, deliveryDay = selected)); onSaved() } }, Modifier.fillMaxWidth()) }
+    val customers by vm.customers.collectAsState(); val current = customers.firstOrNull { it.id == customerId } ?: return
+    var name by remember(current) { mutableStateOf(current.name) }; var phone by remember(current) { mutableStateOf(current.phone) }; var address by remember(current) { mutableStateOf(current.address) }; var note by remember(current) { mutableStateOf(current.note) }; var selected by remember(current) { mutableStateOf(current.deliveryDay) }; var confirmSave by remember { mutableStateOf(false) }; val scope = rememberCoroutineScope()
+    PremiumPage {
+        PremiumPageTitle(stringResource(com.colddelivery.app.R.string.customer_detail), stringResource(com.colddelivery.app.R.string.customer_detail_subtitle))
+        ColdDeliveryCard { Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Field(name, { name = it }, stringResource(com.colddelivery.app.R.string.name)); Field(phone, { phone = it }, stringResource(com.colddelivery.app.R.string.phone), KeyboardType.Phone); Field(address, { address = it }, stringResource(com.colddelivery.app.R.string.address)); Select(stringResource(com.colddelivery.app.R.string.delivery_day), selected.name) { DeliveryDay.values().forEach { d -> DropdownMenuItem(text = { Text(d.name) }, onClick = { selected = d }) } }; Field(note, { note = it }, stringResource(com.colddelivery.app.R.string.note)) } }
+        Text(stringResource(com.colddelivery.app.R.string.sort_order, current.sortOrder), color = Gold, fontSize = 11.sp)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { PremiumOutlinedButton(stringResource(com.colddelivery.app.R.string.move_up), { scope.launch { vm.moveCustomer(customerId, -1) } }, Modifier.weight(1f)); PremiumOutlinedButton(stringResource(com.colddelivery.app.R.string.move_down), { scope.launch { vm.moveCustomer(customerId, 1) } }, Modifier.weight(1f)) }
+        Spacer(Modifier.weight(1f))
+        TextButton({ scope.launch { vm.updateCustomer(current.copy(isActive = false)); onSaved() } }) { Text(stringResource(com.colddelivery.app.R.string.archive_customer), color = DeepRed, fontSize = 11.sp) }
+        PrimaryRedButton(stringResource(com.colddelivery.app.R.string.save_changes), { if (name.isNotBlank()) confirmSave = true }, Modifier.fillMaxWidth())
+    }
+    if (confirmSave) {
+        AlertDialog(onDismissRequest = { confirmSave = false }, title = { Text(stringResource(com.colddelivery.app.R.string.confirm_save_changes)) }, text = {
+            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(stringResource(com.colddelivery.app.R.string.name) + ": " + name)
+                Text(stringResource(com.colddelivery.app.R.string.phone) + ": " + phone)
+                Text(stringResource(com.colddelivery.app.R.string.address) + ": " + address)
+                Text(stringResource(com.colddelivery.app.R.string.note) + ": " + note)
+                Text(stringResource(com.colddelivery.app.R.string.delivery_day) + ": " + selected.name)
+            }
+        }, confirmButton = { TextButton(onClick = { confirmSave = false; scope.launch { vm.updateCustomer(current.copy(name = name, phone = phone, address = address, note = note, deliveryDay = selected)); onSaved() } }) { Text(stringResource(com.colddelivery.app.R.string.confirm)) } }, dismissButton = { TextButton(onClick = { confirmSave = false }) { Text(stringResource(com.colddelivery.app.R.string.cancel)) } })
+    }
 }
-
 @Composable fun AddProductScreen(onSaved: () -> Unit, vm: FeatureViewModel = hiltViewModel()) {
     val context = LocalContext.current
     var code by rememberSaveable { mutableStateOf("") }; var name by rememberSaveable { mutableStateOf("") }; var error by remember { mutableStateOf<String?>(null) }; val scope = rememberCoroutineScope()
     PremiumPage { PremiumPageTitle(stringResource(com.colddelivery.app.R.string.add_product_title), stringResource(com.colddelivery.app.R.string.add_product_subtitle)); ColdDeliveryCard { Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Field(code, { code = it }, stringResource(com.colddelivery.app.R.string.product_code_required)); Field(name, { name = it }, stringResource(com.colddelivery.app.R.string.product_name_required)); Text(stringResource(com.colddelivery.app.R.string.unit_carton), color = Gold, fontSize = 11.sp); error?.let { Text(it, color = DeepRed, fontSize = 11.sp) } } }; Spacer(Modifier.weight(1f)); PrimaryRedButton(stringResource(com.colddelivery.app.R.string.save_product), { scope.launch { try { if (code.isBlank() || name.isBlank()) error(context.getString(com.colddelivery.app.R.string.code_name_required)) else { vm.addProduct(ProductEntity(productCode = code, productName = name, createdAt = System.currentTimeMillis())); onSaved() } } catch (t: Throwable) { error = context.getString(com.colddelivery.app.R.string.product_code_unique) } } }, Modifier.fillMaxWidth()) }
 }
 
-@Composable fun ProductEditScreen(productId: Long, onSaved: () -> Unit, vm: FeatureViewModel = hiltViewModel()) { val context = LocalContext.current; val products by vm.products.collectAsState(); val current = products.firstOrNull { it.id == productId } ?: return; var code by remember(current) { mutableStateOf(current.productCode) }; var name by remember(current) { mutableStateOf(current.productName) }; var error by remember { mutableStateOf<String?>(null) }; val scope = rememberCoroutineScope(); PremiumPage { PremiumPageTitle(stringResource(com.colddelivery.app.R.string.edit_product_title), stringResource(com.colddelivery.app.R.string.edit_product_subtitle)); ColdDeliveryCard { Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Field(code, { code = it }, stringResource(com.colddelivery.app.R.string.product_code_required)); Field(name, { name = it }, stringResource(com.colddelivery.app.R.string.product_name_required)); Text(stringResource(com.colddelivery.app.R.string.unit_carton), color = Gold, fontSize = 11.sp); error?.let { Text(it, color = DeepRed, fontSize = 11.sp) } } }; Spacer(Modifier.weight(1f)); PrimaryRedButton(stringResource(com.colddelivery.app.R.string.save_changes), { scope.launch { try { if (code.isBlank() || name.isBlank()) error(context.getString(com.colddelivery.app.R.string.code_name_required)) else { vm.updateProduct(current.copy(productCode = code, productName = name)); onSaved() } } catch (t: Throwable) { error = context.getString(com.colddelivery.app.R.string.product_code_unique) } } }, Modifier.fillMaxWidth()) } }
-
+@Composable fun ProductEditScreen(productId: Long, onSaved: () -> Unit, vm: FeatureViewModel = hiltViewModel()) {
+    val context = LocalContext.current; val products by vm.products.collectAsState(); val current = products.firstOrNull { it.id == productId } ?: return
+    var code by remember(current) { mutableStateOf(current.productCode) }; var name by remember(current) { mutableStateOf(current.productName) }; var error by remember { mutableStateOf<String?>(null) }; var confirmSave by remember { mutableStateOf(false) }; val scope = rememberCoroutineScope()
+    PremiumPage {
+        PremiumPageTitle(stringResource(com.colddelivery.app.R.string.edit_product_title), stringResource(com.colddelivery.app.R.string.edit_product_subtitle))
+        ColdDeliveryCard { Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Field(code, { code = it }, stringResource(com.colddelivery.app.R.string.product_code_required)); Field(name, { name = it }, stringResource(com.colddelivery.app.R.string.product_name_required)); Text(stringResource(com.colddelivery.app.R.string.unit_carton), color = Gold, fontSize = 11.sp); error?.let { Text(it, color = DeepRed, fontSize = 11.sp) } } }
+        Spacer(Modifier.weight(1f))
+        PrimaryRedButton(stringResource(com.colddelivery.app.R.string.save_changes), { if (code.isBlank() || name.isBlank()) error = context.getString(com.colddelivery.app.R.string.code_name_required) else confirmSave = true }, Modifier.fillMaxWidth())
+    }
+    if (confirmSave) {
+        AlertDialog(onDismissRequest = { confirmSave = false }, title = { Text(stringResource(com.colddelivery.app.R.string.confirm_save_changes)) }, text = {
+            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(stringResource(com.colddelivery.app.R.string.product_name_required) + ": " + name)
+                Text(stringResource(com.colddelivery.app.R.string.product_code_required) + ": " + code)
+                Text(stringResource(com.colddelivery.app.R.string.unit_carton))
+            }
+        }, confirmButton = { TextButton(onClick = { confirmSave = false; scope.launch { try { vm.updateProduct(current.copy(productCode = code, productName = name)); onSaved() } catch (t: Throwable) { error = context.getString(com.colddelivery.app.R.string.product_code_unique) } } }) { Text(stringResource(com.colddelivery.app.R.string.confirm)) } }, dismissButton = { TextButton(onClick = { confirmSave = false }) { Text(stringResource(com.colddelivery.app.R.string.cancel)) } })
+    }
+}
 private data class StockInLine(val product: ProductEntity, val quantity: Int)
 
 @OptIn(ExperimentalMaterial3Api::class)

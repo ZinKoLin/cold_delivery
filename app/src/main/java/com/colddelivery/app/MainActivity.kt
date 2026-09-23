@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     NavHost(nav, startDestination = "home") {
         composable("home") { ShellScreen("Home", nav) { HomeMockupScreen(onNewDelivery = { nav.navigate("new_delivery") }, onPrice = { nav.navigate("prices") }) } }
         composable("customers") { ShellScreen("Customers", nav) { CustomersScreen(onAdd = { nav.navigate("add_customer") }, onOpen = { nav.navigate("customer/$it") }) } }
-        composable("stock") { ShellScreen("Stock", nav) { StockScreen(onAddProduct = { nav.navigate("add_product") }, onStockIn = { nav.navigate("stock_in") }, onOpen = { nav.navigate("product/$it") }) } }
+        composable("stock") { ShellScreen("Stock", nav) { StockScreen(onAddProduct = { nav.navigate("add_product") }, onStockIn = { nav.navigate("stock_in") }, onOpen = { nav.navigate("product/$it") }, onEdit = { nav.navigate("product_edit/$it") }) } }
         composable("history") { ShellScreen("History", nav) { HistoryScreen(onOpen = { nav.navigate("voucher/$it") }) } }
         composable("settings") { ShellScreen("Settings", nav) { SettingsScreen(onLogin = onLogout, onBackup = { nav.navigate("backup") }) } }
         composable("prices") { ShellScreen("Today's Price", nav) { PriceScreen() } }
@@ -50,6 +50,7 @@ class MainActivity : ComponentActivity() {
         composable("voucher/{deliveryId}") { backStack -> val id = backStack.arguments?.getString("deliveryId")?.toLongOrNull() ?: 0L; ShellScreen("Voucher", nav) { VoucherScreen(id, onUndo = { nav.popBackStack() }, onEdit = { nav.navigate("edit_delivery/$id") }) } }
         composable("edit_delivery/{deliveryId}") { backStack -> ShellScreen("Edit Delivery", nav) { EditDeliveryScreen(backStack.arguments?.getString("deliveryId")?.toLongOrNull() ?: 0L, onSaved = { nav.popBackStack() }) } }
         composable("product/{productId}") { backStack -> ShellScreen("Product Detail", nav) { ProductDetailScreen(backStack.arguments?.getString("productId")?.toLongOrNull() ?: 0L) } }
+        composable("product_edit/{productId}") { backStack -> ShellScreen("Edit Product", nav) { ProductEditScreen(backStack.arguments?.getString("productId")?.toLongOrNull() ?: 0L, onSaved = { nav.popBackStack() }) } }
         composable("login") { ShellScreen("Login", nav) { LoginScreen(onLoggedIn = { nav.navigate("home") { popUpTo("login") { inclusive = true } } }) } }
         composable("backup") { ShellScreen("Backup", nav) { BackupScreen(onBack = { nav.popBackStack() }) } }
     }

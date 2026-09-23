@@ -72,6 +72,10 @@
     <string name="move_up">အပေါ်ရွှေ့</string>
     <string name="move_down">အောက်ရွှေ့</string>
     <string name="archive_customer">ဖောက်သည်ကို သိမ်းဆည်းရန်</string>
+    <string name="edit_customer">ဖောက်သည်ပြင်ရန်</string>
+    <string name="edit_product">ကုန်ပစ္စည်းပြင်ရန်</string>
+    <string name="edit_product_title">ကုန်ပစ္စည်းပြင်ရန်</string>
+    <string name="edit_product_subtitle">ကုန်ပစ္စည်းအချက်အလက် ပြင်ဆင်ရန်</string>
     <string name="save_changes">ပြင်ဆင်မှုများ သိမ်းရန်</string>
     <string name="save_customer">ဖောက်သည် သိမ်းရန်</string>
     <string name="add_product_title">ကုန်ပစ္စည်းထည့်ရန်</string>

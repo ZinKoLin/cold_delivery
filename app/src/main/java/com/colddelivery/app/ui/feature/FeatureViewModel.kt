@@ -47,6 +47,7 @@ class FeatureViewModel @Inject constructor(private val db: ColdDeliveryDatabase,
         db.customerDao().update(other.copy(sortOrder = current.sortOrder))
     }
     suspend fun addProduct(product: ProductEntity) = db.productDao().insert(product)
+    suspend fun updateProduct(product: ProductEntity) = db.productDao().update(product)
     suspend fun stockIn(batch: StockBatchEntity) = db.stockBatchDao().insert(batch)
     suspend fun savePrice(productId: Long, date: Long, price: Long) { val now = System.currentTimeMillis(); db.dailyPriceDao().upsert(DailyPriceEntity(productId = productId, priceDate = date, price = price, createdAt = now, updatedAt = now)) }
     suspend fun saveDelivery(customerId: Long, date: Long, items: List<Pair<Long, Int>>): Long = repository.saveDelivered(customerId, date, items, System.currentTimeMillis())

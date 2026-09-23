@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     NavHost(nav, startDestination = "home") {
         composable("home") { ShellScreen("Home", nav) { HomeMockupScreen(onNewDelivery = { nav.navigate("new_delivery") }, onPrice = { nav.navigate("prices") }) } }
         composable("customers") { ShellScreen("Customers", nav) { CustomersScreen(onAdd = { nav.navigate("add_customer") }, onOpen = { nav.navigate("customer/$it") }) } }
-        composable("stock") { ShellScreen("Stock", nav) { StockScreen(onAddProduct = { nav.navigate("add_product") }, onStockIn = { nav.navigate("stock_in") }, onOpen = { nav.navigate("product/$it") }, onEdit = { nav.navigate("product_edit/$it") }) } }
+        composable("stock") { ShellScreen("Stock", nav) { StockScreen(onAddProduct = { nav.navigate("add_product") }, onStockIn = { nav.navigate("stock_in") }, onOpen = { nav.navigate("product/$it") }, onEdit = { nav.navigate("product_edit/$it") }, onTickets = { nav.navigate("stock_tickets") }) } }
         composable("history") { ShellScreen("History", nav) { HistoryScreen(onOpen = { nav.navigate("voucher/$it") }) } }
         composable("settings") { ShellScreen("Settings", nav) { SettingsScreen(onLogin = onLogout, onBackup = { nav.navigate("backup") }) } }
         composable("prices") { ShellScreen("Today's Price", nav) { PriceScreen() } }
@@ -46,7 +46,9 @@ class MainActivity : ComponentActivity() {
         composable("add_customer") { ShellScreen("Add Customer", nav) { AddCustomerScreen(onSaved = { nav.popBackStack() }) } }
         composable("customer/{customerId}") { backStack -> ShellScreen("Customer Detail", nav) { CustomerDetailScreen(backStack.arguments?.getString("customerId")?.toLongOrNull() ?: 0L, onSaved = { nav.popBackStack() }) } }
         composable("add_product") { ShellScreen("Add Product", nav) { AddProductScreen(onSaved = { nav.popBackStack() }) } }
-        composable("stock_in") { ShellScreen("Stock In", nav) { StockInScreen(onSaved = { nav.popBackStack() }) } }
+        composable("stock_in") { ShellScreen("Stock In Ticket", nav) { StockInScreen(onSaved = { nav.popBackStack() }) } }
+        composable("stock_tickets") { ShellScreen("Stock In Tickets", nav) { StockInTicketsScreen(onOpen = { nav.navigate("stock_ticket/$it") }) } }
+        composable("stock_ticket/{ticketId}") { backStack -> ShellScreen("Stock In Ticket", nav) { StockInTicketDetailScreen(backStack.arguments?.getString("ticketId")?.toLongOrNull() ?: 0L, onBack = { nav.popBackStack() }) } }
         composable("voucher/{deliveryId}") { backStack -> val id = backStack.arguments?.getString("deliveryId")?.toLongOrNull() ?: 0L; ShellScreen("Voucher", nav) { VoucherScreen(id, onUndo = { nav.popBackStack() }, onEdit = { nav.navigate("edit_delivery/$id") }) } }
         composable("edit_delivery/{deliveryId}") { backStack -> ShellScreen("Edit Delivery", nav) { EditDeliveryScreen(backStack.arguments?.getString("deliveryId")?.toLongOrNull() ?: 0L, onSaved = { nav.popBackStack() }) } }
         composable("product/{productId}") { backStack -> ShellScreen("Product Detail", nav) { ProductDetailScreen(backStack.arguments?.getString("productId")?.toLongOrNull() ?: 0L) } }

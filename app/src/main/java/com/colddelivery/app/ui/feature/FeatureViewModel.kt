@@ -23,6 +23,7 @@ class FeatureViewModel @Inject constructor(private val db: ColdDeliveryDatabase,
     val customers = repository.observeCustomers().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val deliveries = repository.observeHistory().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val totalStock = repository.observeTotalStock().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+    val stockInTickets = db.stockInTicketDao().observeAll().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val language = preferences.language.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "en")
     val lowStockThreshold = preferences.lowStockThreshold.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 10)
     val today: Long get() = LocalDate.now().toEpochDay()
@@ -49,6 +50,13 @@ class FeatureViewModel @Inject constructor(private val db: ColdDeliveryDatabase,
     suspend fun addProduct(product: ProductEntity) = db.productDao().insert(product)
     suspend fun updateProduct(product: ProductEntity) = db.productDao().update(product)
     suspend fun stockIn(batch: StockBatchEntity) = db.stockBatchDao().insert(batch)
+    suspend fun createStockInTicket(date: Long, items: List<Pair<Long, Int>>): Long = db.withTransaction {
+        val ticketId = db.stockInTicketDao().insert(StockInTicketEntity(ticketDate = date, createdAt = System.currentTimeMillis()))
+        db.stockBatchDao().insertAll(items.map { (productId, qty) -> StockBatchEntity(productId = productId, stockInDate = date, initialQty = qty, remainingQty = qty, createdAt = System.currentTimeMillis(), ticketId = ticketId) })
+        ticketId
+    }
+    suspend fun stockInTicket(ticketId: Long) = db.stockInTicketDao().get(ticketId)
+    suspend fun stockInTicketBatches(ticketId: Long) = db.stockInTicketDao().batches(ticketId)
     suspend fun savePrice(productId: Long, date: Long, price: Long) { val now = System.currentTimeMillis(); db.dailyPriceDao().upsert(DailyPriceEntity(productId = productId, priceDate = date, price = price, createdAt = now, updatedAt = now)) }
     suspend fun saveDelivery(customerId: Long, date: Long, items: List<Pair<Long, Int>>): Long = repository.saveDelivered(customerId, date, items, System.currentTimeMillis())
     suspend fun undo(deliveryId: Long) = repository.undo(deliveryId)

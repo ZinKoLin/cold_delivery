@@ -14,6 +14,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -127,11 +130,139 @@ private fun day(v: Long) = LocalDate.ofEpochDay(v).format(DateTimeFormatter.ofPa
 
 @Composable fun ProductEditScreen(productId: Long, onSaved: () -> Unit, vm: FeatureViewModel = hiltViewModel()) { val context = LocalContext.current; val products by vm.products.collectAsState(); val current = products.firstOrNull { it.id == productId } ?: return; var code by remember(current) { mutableStateOf(current.productCode) }; var name by remember(current) { mutableStateOf(current.productName) }; var error by remember { mutableStateOf<String?>(null) }; val scope = rememberCoroutineScope(); PremiumPage { PremiumPageTitle(stringResource(com.colddelivery.app.R.string.edit_product_title), stringResource(com.colddelivery.app.R.string.edit_product_subtitle)); ColdDeliveryCard { Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Field(code, { code = it }, stringResource(com.colddelivery.app.R.string.product_code_required)); Field(name, { name = it }, stringResource(com.colddelivery.app.R.string.product_name_required)); Text(stringResource(com.colddelivery.app.R.string.unit_carton), color = Gold, fontSize = 11.sp); error?.let { Text(it, color = DeepRed, fontSize = 11.sp) } } }; Spacer(Modifier.weight(1f)); PrimaryRedButton(stringResource(com.colddelivery.app.R.string.save_changes), { scope.launch { try { if (code.isBlank() || name.isBlank()) error(context.getString(com.colddelivery.app.R.string.code_name_required)) else { vm.updateProduct(current.copy(productCode = code, productName = name)); onSaved() } } catch (t: Throwable) { error = context.getString(com.colddelivery.app.R.string.product_code_unique) } } }, Modifier.fillMaxWidth()) } }
 
+private data class StockInLine(val product: ProductEntity, val quantity: Int)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable fun StockInScreen(onSaved: () -> Unit, vm: FeatureViewModel = hiltViewModel()) {
-    val products by vm.products.collectAsState(); var selected by remember { mutableStateOf<ProductEntity?>(null) }; var qty by rememberSaveable { mutableStateOf("") }; val scope = rememberCoroutineScope()
-    PremiumPage { PremiumPageTitle(stringResource(com.colddelivery.app.R.string.stock_in), stringResource(com.colddelivery.app.R.string.add_product_subtitle)); ColdDeliveryCard { Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Select(stringResource(com.colddelivery.app.R.string.select_product_label), selected?.productName ?: stringResource(com.colddelivery.app.R.string.select_product)) { products.forEach { p -> DropdownMenuItem(text = { Text(p.productName) }, onClick = { selected = p }) } }; Field(qty, { qty = it.filter(Char::isDigit) }, stringResource(com.colddelivery.app.R.string.quantity_ctn), KeyboardType.Number); Text(stringResource(com.colddelivery.app.R.string.stock_in_date, day(vm.today)), color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp) } }; Spacer(Modifier.weight(1f)); PrimaryRedButton(stringResource(com.colddelivery.app.R.string.save_stock_in), { scope.launch { if (selected != null && qty.toIntOrNull() ?: 0 > 0) { vm.stockIn(StockBatchEntity(productId = selected!!.id, stockInDate = vm.today, initialQty = qty.toInt(), remainingQty = qty.toInt(), createdAt = System.currentTimeMillis())); onSaved() } } }, Modifier.fillMaxWidth()) }
+    val products by vm.products.collectAsState()
+    var selected by remember { mutableStateOf<ProductEntity?>(null) }
+    var qty by rememberSaveable { mutableStateOf("") }
+    var ticketDate by rememberSaveable { mutableStateOf(vm.today) }
+    var lines by remember { mutableStateOf<List<StockInLine>>(emptyList()) }
+    var datePickerOpen by remember { mutableStateOf(false) }
+    var confirmOpen by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    PremiumPage {
+        PremiumPageTitle(stringResource(com.colddelivery.app.R.string.stock_in_ticket), stringResource(com.colddelivery.app.R.string.stock_in_ticket_subtitle))
+        ColdDeliveryCard {
+            Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton({ datePickerOpen = true }, Modifier.fillMaxWidth().heightIn(min = 50.dp), shape = com.colddelivery.app.ui.theme.ColdDeliveryShapes.Input) {
+                    Text(stringResource(com.colddelivery.app.R.string.stock_in_date, day(ticketDate)), color = ColdDeliveryColors.Charcoal)
+                }
+                Select(stringResource(com.colddelivery.app.R.string.select_product_label), selected?.productName ?: stringResource(com.colddelivery.app.R.string.select_product)) {
+                    products.forEach { product -> DropdownMenuItem(text = { Text("\${product.productName} (\${product.productCode})") }, onClick = { selected = product }) }
+                }
+                Field(qty, { qty = it }, stringResource(com.colddelivery.app.R.string.quantity_ctn), KeyboardType.Number)
+                TextButton(onClick = {
+                    val amount = qty.toIntOrNull() ?: 0
+                    val product = selected
+                    if (product != null && amount > 0 && lines.none { it.product.id == product.id }) {
+                        lines = lines + StockInLine(product, amount)
+                        selected = null
+                        qty = ""
+                    }
+                }) { Text(stringResource(com.colddelivery.app.R.string.add_ticket_item), color = DeepRed) }
+            }
+        }
+        if (lines.isNotEmpty()) {
+            SectionHeading(stringResource(com.colddelivery.app.R.string.ticket_items))
+            lines.forEach { line ->
+                ColdDeliveryCard {
+                    Row(Modifier.fillMaxWidth().padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(line.product.productName, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Text(line.product.productCode, color = Gold, fontSize = 10.sp)
+                        }
+                        Text("\${line.quantity} CTN", fontWeight = FontWeight.Bold)
+                        IconButton(onClick = { lines = lines.filterNot { it.product.id == line.product.id } }) {
+                            Icon(Icons.Default.Close, contentDescription = stringResource(com.colddelivery.app.R.string.remove))
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.weight(1f))
+        PrimaryRedButton(stringResource(com.colddelivery.app.R.string.create_stock_in_ticket), { if (lines.isNotEmpty()) confirmOpen = true }, Modifier.fillMaxWidth())
+    }
+
+    if (datePickerOpen) {
+        val state = rememberDatePickerState()
+        DatePickerDialog(onDismissRequest = { datePickerOpen = false }, confirmButton = {
+            TextButton(onClick = {
+                val picked = state.selectedDateMillis?.div(86_400_000L) ?: ticketDate
+                ticketDate = minOf(picked, vm.today)
+                datePickerOpen = false
+            }) { Text(stringResource(com.colddelivery.app.R.string.confirm)) }
+        }, dismissButton = { TextButton(onClick = { datePickerOpen = false }) { Text(stringResource(com.colddelivery.app.R.string.cancel)) } }) {
+            DatePicker(state = state)
+        }
+    }
+    if (confirmOpen) {
+        AlertDialog(onDismissRequest = { confirmOpen = false }, title = { Text(stringResource(com.colddelivery.app.R.string.confirm_stock_in_ticket)) }, text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(com.colddelivery.app.R.string.stock_in_date, day(ticketDate)))
+                lines.forEach { Text("\${it.product.productName}: \${it.quantity} CTN") }
+            }
+        }, confirmButton = {
+            TextButton(onClick = {
+                confirmOpen = false
+                scope.launch {
+                    vm.createStockInTicket(ticketDate, lines.map { it.product.id to it.quantity })
+                    onSaved()
+                }
+            }) { Text(stringResource(com.colddelivery.app.R.string.create_ticket)) }
+        }, dismissButton = { TextButton(onClick = { confirmOpen = false }) { Text(stringResource(com.colddelivery.app.R.string.cancel)) } })
+    }
 }
 
+@Composable fun StockInTicketsScreen(onOpen: (Long) -> Unit, vm: FeatureViewModel = hiltViewModel()) {
+    val tickets by vm.stockInTickets.collectAsState()
+    var batches by remember { mutableStateOf<Map<Long, List<StockBatchEntity>>>(emptyMap()) }
+    LaunchedEffect(tickets) { batches = tickets.associate { it.id to vm.stockInTicketBatches(it.id) } }
+    PremiumPage {
+        PremiumPageTitle(stringResource(com.colddelivery.app.R.string.stock_in_tickets), stringResource(com.colddelivery.app.R.string.stock_in_tickets_subtitle))
+        if (tickets.isEmpty()) {
+            ColdDeliveryCard { Text(stringResource(com.colddelivery.app.R.string.no_stock_in_tickets), Modifier.padding(20.dp), color = ColdDeliveryColors.SecondaryText) }
+        } else {
+            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(tickets, key = { it.id }) { ticket ->
+                    val items = batches[ticket.id].orEmpty()
+                    ColdDeliveryCard(Modifier.fillMaxWidth().clickable { onOpen(ticket.id) }) {
+                        Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column {
+                                Text(stringResource(com.colddelivery.app.R.string.stock_in_ticket_number, ticket.id), color = Gold, fontSize = 11.sp)
+                                Text(day(ticket.ticketDate), fontWeight = FontWeight.Bold)
+                            }
+                            Text(stringResource(com.colddelivery.app.R.string.stock_in_ticket_summary, items.size, items.sumOf { it.initialQty }), color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable fun StockInTicketDetailScreen(ticketId: Long, onBack: () -> Unit, vm: FeatureViewModel = hiltViewModel()) {
+    var ticket by remember { mutableStateOf<StockInTicketEntity?>(null) }
+    var batches by remember { mutableStateOf(emptyList<StockBatchEntity>()) }
+    val products by vm.products.collectAsState()
+    LaunchedEffect(ticketId) { ticket = vm.stockInTicket(ticketId); batches = vm.stockInTicketBatches(ticketId) }
+    PremiumPage {
+        PremiumPageTitle(stringResource(com.colddelivery.app.R.string.stock_in_ticket_detail), ticket?.let { day(it.ticketDate) } ?: "")
+        LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(batches, key = { it.id }) { batch ->
+                ColdDeliveryCard {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(products.firstOrNull { it.id == batch.productId }?.productName ?: stringResource(com.colddelivery.app.R.string.product), fontWeight = FontWeight.Bold)
+                        Text(products.firstOrNull { it.id == batch.productId }?.productCode ?: "", color = Gold, fontSize = 10.sp)
+                        Text(stringResource(com.colddelivery.app.R.string.stock_in_ticket_quantities, batch.initialQty, batch.remainingQty), color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp)
+                    }
+                }
+            }
+        }
+    }
+}
 @Composable fun ProductDetailScreen(productId: Long, vm: FeatureViewModel = hiltViewModel()) {
     val products by vm.products.collectAsState(); val product = products.firstOrNull { it.id == productId }; var total by remember { mutableStateOf(0) }; var batches by remember { mutableStateOf(emptyList<StockBatchEntity>()) }; LaunchedEffect(productId) { total = vm.stockTotal(productId); batches = vm.stockBatches(productId) }
     PremiumPage { PremiumPageTitle(product?.productName ?: stringResource(com.colddelivery.app.R.string.product), product?.productCode ?: ""); ColdDeliveryCard { Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Column { Text(stringResource(com.colddelivery.app.R.string.total_stock), color = ColdDeliveryColors.SecondaryText, fontSize = 10.sp); Text("$total CTN", color = if (total == 0) DeepRed else DeliveredGreen, fontSize = 22.sp, fontWeight = FontWeight.Bold) }; Text(stringResource(com.colddelivery.app.R.string.fifo_oldest_first), color = Gold, fontSize = 11.sp) } }; Text(stringResource(com.colddelivery.app.R.string.fifo_batches), color = DeepRed, fontWeight = FontWeight.Bold); LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) { items(batches, key = { it.id }) { b -> ColdDeliveryCard { Column(Modifier.padding(12.dp)) { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(stringResource(com.colddelivery.app.R.string.stock_in_date_value, day(b.stockInDate)), fontWeight = FontWeight.Bold, fontSize = 13.sp); Text(stringResource(if (b.remainingQty == 0) com.colddelivery.app.R.string.consumed else com.colddelivery.app.R.string.active), color = if (b.remainingQty == 0) DeepRed else DeliveredGreen, fontSize = 10.sp, fontWeight = FontWeight.Bold) }; Text(stringResource(com.colddelivery.app.R.string.batch_quantities, b.initialQty, b.remainingQty), color = ColdDeliveryColors.SecondaryText, fontSize = 11.sp) } } } } }

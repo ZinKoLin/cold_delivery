@@ -9,7 +9,9 @@ enum class DeliveryDay { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY 
 
 @Entity(tableName = "products", indices = [Index(value = ["productCode"], unique = true)]) data class ProductEntity(@PrimaryKey(autoGenerate = true) val id: Long = 0, val productCode: String, val productName: String, val unit: String = "CARTON", val isActive: Boolean = true, val createdAt: Long)
 
-@Entity(tableName = "stock_batches", foreignKeys = [ForeignKey(entity = ProductEntity::class, parentColumns = ["id"], childColumns = ["productId"], onDelete = ForeignKey.CASCADE)], indices = [Index("productId"), Index("stockInDate")]) data class StockBatchEntity(@PrimaryKey(autoGenerate = true) val id: Long = 0, val productId: Long, val stockInDate: Long, val initialQty: Int, val remainingQty: Int, val createdAt: Long)
+@Entity(tableName = "stock_in_tickets") data class StockInTicketEntity(@PrimaryKey(autoGenerate = true) val id: Long = 0, val ticketDate: Long, val createdAt: Long)
+
+@Entity(tableName = "stock_batches", foreignKeys = [ForeignKey(entity = ProductEntity::class, parentColumns = ["id"], childColumns = ["productId"], onDelete = ForeignKey.CASCADE)], indices = [Index("productId"), Index("stockInDate"), Index("ticketId")]) data class StockBatchEntity(@PrimaryKey(autoGenerate = true) val id: Long = 0, val productId: Long, val stockInDate: Long, val initialQty: Int, val remainingQty: Int, val createdAt: Long, val ticketId: Long? = null)
 
 @Entity(tableName = "customers", indices = [Index("deliveryDay"), Index("sortOrder")]) data class CustomerEntity(@PrimaryKey(autoGenerate = true) val id: Long = 0, val name: String, val phone: String, val address: String, val deliveryDay: DeliveryDay, val note: String, val sortOrder: Int = 0, val isActive: Boolean = true, val createdAt: Long)
 

@@ -68,6 +68,11 @@
     <string name="edit_product">Edit product</string>
     <string name="edit_product_title">Edit Product</string>
     <string name="edit_product_subtitle">Update product information</string>
+    <string name="confirm_edit">Confirm Edit</string>
+    <string name="confirm_edit_customer">Edit customer “%1$s”?</string>
+    <string name="confirm_edit_product">Edit product “%1$s”?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
     <string name="save_changes">Save Changes</string>
     <string name="save_customer">Save Customer</string>
     <string name="add_product_title">Add Product</string>

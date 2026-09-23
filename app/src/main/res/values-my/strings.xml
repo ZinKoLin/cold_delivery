@@ -76,6 +76,11 @@
     <string name="edit_product">ကုန်ပစ္စည်းပြင်ရန်</string>
     <string name="edit_product_title">ကုန်ပစ္စည်းပြင်ရန်</string>
     <string name="edit_product_subtitle">ကုန်ပစ္စည်းအချက်အလက် ပြင်ဆင်ရန်</string>
+    <string name="confirm_edit">ပြင်ဆင်မှု အတည်ပြုရန်</string>
+    <string name="confirm_edit_customer">“%1$s” ဖောက်သည်ကို ပြင်ဆင်မလား။</string>
+    <string name="confirm_edit_product">“%1$s” ကုန်ပစ္စည်းကို ပြင်ဆင်မလား။</string>
+    <string name="confirm">အတည်ပြုမည်</string>
+    <string name="cancel">မလုပ်တော့ပါ</string>
     <string name="save_changes">ပြင်ဆင်မှုများ သိမ်းရန်</string>
     <string name="save_customer">ဖောက်သည် သိမ်းရန်</string>
     <string name="add_product_title">ကုန်ပစ္စည်းထည့်ရန်</string>

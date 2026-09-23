@@ -19,7 +19,7 @@ val releaseKeyPassword = signingValue("RELEASE_KEY_PASSWORD")
 val releaseSigningConfigured = listOf(releaseStoreFilePath, releaseStorePassword, releaseKeyAlias, releaseKeyPassword).all { !it.isNullOrBlank() }
 
 android { namespace = "com.colddelivery.app"; compileSdk = 35
-    defaultConfig { applicationId = "com.colddelivery.app"; minSdk = 26; targetSdk = 35; versionCode = 2; versionName = "1.0.1"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
+    defaultConfig { applicationId = "com.colddelivery.app"; minSdk = 26; targetSdk = 35; versionCode = 3; versionName = "1.0.2"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     signingConfigs {
         create("release") {
             if (releaseSigningConfigured) {
